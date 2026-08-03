@@ -1,0 +1,56 @@
+# External calibration data: expected weight of the minimum spanning tree of K_n
+# under i.i.d. Exp(1) edge weights.
+#
+# Source: D. Gamarnik, "The expected value of random minimal length spanning tree
+# of a complete graph", SODA 2005, Table 1, column "Exp (1)".
+# Values are as printed there, rounded to four decimal places, for n = 2, ..., 45.
+#
+# These numbers are NOT produced by this repository.  They are transcribed from the
+# published table and are used by tests/check_paper_claims.py as an outside-the-repo
+# check on the exact rationals computed here.
+#
+# n  E[L_n] (4 dp, as printed)
+2   1.0000
+3   1.1667
+4   1.2167
+5   1.2353
+6   1.2427
+7   1.2454
+8   1.2460
+9   1.2455
+10  1.2445
+11  1.2432
+12  1.2418
+13  1.2405
+14  1.2391
+15  1.2379
+16  1.2366
+17  1.2355
+18  1.2344
+19  1.2333
+20  1.2323
+21  1.2314
+22  1.2305
+23  1.2297
+24  1.2289
+25  1.2282
+26  1.2275
+27  1.2268
+28  1.2262
+29  1.2256
+30  1.2250
+31  1.2245
+32  1.2240
+33  1.2235
+34  1.2230
+35  1.2225
+36  1.2221
+37  1.2217
+38  1.2213
+39  1.2209
+40  1.2206
+41  1.2202
+42  1.2199
+43  1.2196
+44  1.2192
+45  1.2189

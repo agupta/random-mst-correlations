@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.lof
+*.lot
+*.synctex.gz
+
+# paper/main.pdf and evidence/SHA256SUMS.txt are build products of `make paper`
+# and `make sha256`; they are deliberately NOT ignored, so that a built PDF and
+# its digest can be committed alongside the sources they were built from.
