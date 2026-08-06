@@ -159,6 +159,106 @@ def mst_pair_probability(nv: int, edges, e: int, f: int) -> Fraction:
 
 
 # ---------------------------------------------------------------------------
+# symmetry-compressed relative-order enumeration for the simple hub family
+# ---------------------------------------------------------------------------
+
+def _hub_join(partition, subset):
+    """Merge the terminal blocks touched by one hub's lighter incident edges."""
+    subset = frozenset(subset)
+    if len(subset) <= 1:
+        return partition
+    touched = [block for block in partition if block & subset]
+    untouched = [block for block in partition if not block & subset]
+    merged = frozenset().union(*touched)
+    return tuple(sorted(untouched + [merged], key=min))
+
+
+def _hub_connected(partition, x: int, y: int) -> bool:
+    return any(x in block and y in block for block in partition)
+
+
+@lru_cache(maxsize=None)
+def hub_family_finite(s: int):
+    """Exact probabilities for the simple ``s``-hub family.
+
+    The four terminals are 0,1,2,3, the marked edges are 01 and 23, and each
+    of ``s`` independent hub vertices is joined to all four terminals.  The
+    calculation groups the 2^(4s) marginal patterns and 3^(4s) pair patterns
+    by the two induced terminal partitions and their block sizes.  It is an
+    exact symmetry-compressed version of route 2, intended for the explicitly
+    finite range used in the manuscript.
+    """
+    if s < 1:
+        raise ValueError("s >= 1 required")
+
+    discrete = tuple(frozenset((i,)) for i in range(4))
+    m = 4 * s + 2
+
+    # Marginal of 01.  The other marked edge 23 is either below or above it.
+    marginal_states = {(discrete, 0): 1}
+    for _ in range(s):
+        nxt = {}
+        for (partition, below), count in marginal_states.items():
+            for mask in range(16):
+                subset = tuple(i for i in range(4) if mask >> i & 1)
+                key = (_hub_join(partition, subset), below + len(subset))
+                nxt[key] = nxt.get(key, 0) + count
+        marginal_states = nxt
+
+    p_a = Fraction(0)
+    for (partition, below), count in marginal_states.items():
+        for marked_below in (False, True):
+            tested = _hub_join(partition, (2, 3)) if marked_below else partition
+            if _hub_connected(tested, 0, 1):
+                continue
+            k = below + int(marked_below)
+            p_a += count * Fraction(factorial(k) * factorial(m - 1 - k), factorial(m))
+
+    # Joint probability, first on the region w(01)<w(23).  For each hub,
+    # ``low`` is the subset of incident edges below the first marked weight and
+    # ``middle`` the subset between the marked weights.
+    choices = []
+    for low_mask in range(16):
+        for middle_mask in range(16):
+            if low_mask & middle_mask:
+                continue
+            low = tuple(i for i in range(4) if low_mask >> i & 1)
+            through_middle = tuple(
+                i for i in range(4) if (low_mask | middle_mask) >> i & 1
+            )
+            choices.append((low, through_middle, len(low), middle_mask.bit_count()))
+
+    pair_states = {(discrete, discrete, 0, 0): 1}
+    for _ in range(s):
+        nxt = {}
+        for (low_part, middle_part, below, middle), count in pair_states.items():
+            for low, through_middle, add_below, add_middle in choices:
+                key = (
+                    _hub_join(low_part, low),
+                    _hub_join(middle_part, through_middle),
+                    below + add_below,
+                    middle + add_middle,
+                )
+                nxt[key] = nxt.get(key, 0) + count
+        pair_states = nxt
+
+    one_order = Fraction(0)
+    for (low_part, middle_part, below, middle), count in pair_states.items():
+        if _hub_connected(low_part, 0, 1):
+            continue
+        with_first = _hub_join(middle_part, (0, 1))
+        if _hub_connected(with_first, 2, 3):
+            continue
+        above = m - 2 - below - middle
+        one_order += count * Fraction(
+            factorial(below) * factorial(middle) * factorial(above), factorial(m)
+        )
+
+    p_ab = 2 * one_order
+    return p_a, p_a, p_ab, p_ab / (p_a * p_a)
+
+
+# ---------------------------------------------------------------------------
 # route 3: the accepted-merger coalescent on K_n
 # ---------------------------------------------------------------------------
 

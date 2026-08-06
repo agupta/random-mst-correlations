@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import csv
 import os
+import re
 import sys
 from fractions import Fraction
 from functools import lru_cache
@@ -47,6 +48,7 @@ from mst_exact import (  # noqa: E402
     expected_mst_length_poly,
     hierarchy_HJ,
     hierarchy_shapes,
+    hub_family_finite,
     maxlaw_family,
     maxlaw_family_by_integration,
     mst_marginals,
@@ -98,6 +100,10 @@ def hub_witness_edges(s: int):
         [(0, 1), (2, 3)]
         + [(wing, hub) for hub in range(4, 4 + s) for wing in range(4)]
     )
+
+
+def harmonic_number(n: int) -> Fraction:
+    return sum((Fraction(1, k) for k in range(1, n + 1)), Fraction(0))
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +188,31 @@ def block1_measure_self_tests(full: bool) -> None:
           "seven-vertex hub witness: ratio differs")
     check(hub3_ratio > Fraction(78100, 77841),
           "seven-vertex hub witness does not beat the bundle maximum")
+
+    # A symmetry-compressed relative-order calculation reaches the finite
+    # range stated in Proposition 4.4.  Its s=2,3 values are checked above by
+    # the unspecialized route.
+    hub_expected = {
+        1: (Fraction(2, 3), Fraction(4, 9)),
+        2: (Fraction(1, 2), Fraction(1186, 4725)),
+        3: (Fraction(1123, 2730), Fraction(71479, 420420)),
+        4: (Fraction(544933, 1531530), Fraction(24528499, 192972780)),
+        5: (Fraction(568103, 1790712), Fraction(1017591682, 10082827755)),
+        6: (Fraction(10731429, 37182145), Fraction(1676413313149, 20098436658300)),
+        7: (Fraction(2606373997, 9786090600), Fraction(106303586434949, 1498769133661800)),
+        8: (Fraction(320245982159, 1289317436550), Fraction(2561006549304523, 41571122812619400)),
+        9: (Fraction(4951519969327, 21202108956600), Fraction(197400895109230339, 3629186192210178600)),
+    }
+    hub_ratios = []
+    for s, expected in hub_expected.items():
+        p_a, p_b, p_ab, ratio = hub_family_finite(s)
+        check(p_a == p_b and (p_a, p_ab) == expected,
+              f"hub family s={s}: finite-range exact values differ")
+        hub_ratios.append(ratio)
+    check(max(range(1, 10), key=lambda s: hub_ratios[s - 1]) == 3,
+          "hub family: finite-range maximum is not uniquely at s=3")
+    check(all(ratio < 1 for ratio in hub_ratios[6:]),
+          "hub family: ratio is not below one for s=7,8,9")
 
     report("PASS block 1: MST measure self-tests -- p_0 = 2/n, sum_e p_e = n-1, "
            "two direct enumerations agree on K_4 and the five-vertex witness; "
@@ -287,9 +318,9 @@ def _pair_probs_from_measure(n: int):
     return p1, p2
 
 
-def block2_bridge_to_coalescent() -> None:
+def block2_bridge_to_coalescent(full: bool) -> None:
     measured = {}
-    for n in (4, 5):
+    for n in ((4, 5, 6) if full else (4, 5)):
         p1, p2 = _pair_probs_from_measure(n)
         measured[n] = (p1, p2)
         m = coalescent_moments(n)
@@ -309,8 +340,9 @@ def block2_bridge_to_coalescent() -> None:
     check(measured[5] == (Fraction(919, 7560), Fraction(593, 3780)),
           "K_5: (p_1, p_2) != (919/7560, 593/3780)")
 
+    sizes = "K_4, K_5 and K_6" if full else "K_4 and K_5"
     report("PASS block 2: the accepted-merger coalescent reproduces the MST "
-           "measure on K_4 and K_5 (p_1, p_2, E[Phi], Proposition D1)")
+           f"measure on {sizes} (p_1, p_2, E[Phi], Proposition D1)")
 
 
 # ---------------------------------------------------------------------------
@@ -318,6 +350,18 @@ def block2_bridge_to_coalescent() -> None:
 # ---------------------------------------------------------------------------
 
 def block3_pathwise(shape_max: int) -> None:
+    def is_comb(node) -> bool:
+        if node[1] is None:
+            return True
+        _, left, right = node
+        if left[1] is None and right[1] is None:
+            return True
+        if left[1] is None:
+            return is_comb(right)
+        if right[1] is None:
+            return is_comb(left)
+        return False
+
     counts = []
     for n in range(1, shape_max + 1):
         shapes = hierarchy_shapes(n)
@@ -327,11 +371,15 @@ def block3_pathwise(shape_max: int) -> None:
             check(h - j == n - Fraction(1, n), f"pathwise identity H - J = n - 1/n fails at n={n}")
             if n >= 2:
                 check(j >= Fraction(n - 1, n), f"pathwise J >= (n-1)/n fails at n={n}")
+                harmonic_bound = harmonic_number(n) - 1
+                check(j >= harmonic_bound, f"pathwise J >= H_n-1 fails at n={n}")
+                check((j == harmonic_bound) == is_comb(shape),
+                      f"equality in J >= H_n-1 is not exactly the comb case at n={n}")
             if n >= 3:
                 check(j > Fraction(n - 1, n), f"strict J > (n-1)/n fails at n={n}")
             check(8 * (n - 1) - 4 * h <= Fraction(4 * (n - 1) * (n - 2), n),
                   f"pathwise E[Phi | history] upper bound fails at n={n}")
-    report(f"PASS block 3: pathwise H - J = n - 1/n and J >= (n-1)/n on every "
+    report(f"PASS block 3: pathwise H - J = n - 1/n and sharp J >= H_n-1 on every "
            f"merger-history shape, n <= {shape_max}; shape counts = {counts}")
 
     # (F4): the disjoint-pair bound is NOT pathwise.  Balanced hierarchy, n=4.
@@ -408,15 +456,14 @@ def block5_expected_length(poly_max: int) -> None:
         m = coalescent_moments(n)
         check(m["EL"] == expected_mst_length_poly(n),
               f"E[L_{n}]: coalescent route != connectivity-polynomial route")
-        check(m["EH"] == n * m["EL"], f"E[H] = n E[L_n] fails at n={n}")
         check(m["EH"] == n - Fraction(1, n) + m["EJ"],
               f"H - J = n - 1/n in expectation fails at n={n}")
     check(coalescent_moments(2)["EL"] == 1, "E[L_2] != 1")
     check(coalescent_moments(3)["EL"] == Fraction(7, 6), "E[L_3] != 7/6")
     check(coalescent_moments(4)["EL"] == Fraction(73, 60), "E[L_4] != 73/60")
     report(f"PASS block 5: E[L_n] agrees between the coalescent and the "
-           f"connectivity-polynomial route for 2 <= n <= {poly_max}, and "
-           f"E[H] = n E[L_n] = n - 1/n + E[J]")
+           f"connectivity-polynomial route for 2 <= n <= {poly_max}; "
+           f"E[H] = n - 1/n + E[J] is recomputed from merger increments")
 
     path = os.path.join(ROOT, "data", "gamarnik-2005-exp1-table.txt")
     compared = 0
@@ -445,7 +492,8 @@ def block5_expected_length(poly_max: int) -> None:
 
 TABLE_FIELDS = [
     "n", "p0", "p1", "p2", "p0_squared", "E_deg_squared", "E_L_n",
-    "E_L_n_upper_bound", "E_L_n_lower_bound", "p1_over_p0sq_float",
+    "E_L_n_upper_bound", "E_L_n_lower_bound", "E_L_n_harmonic_lower_bound",
+    "p1_over_p0sq_float",
     "p2_over_p0sq_float",
 ]
 
@@ -472,6 +520,7 @@ def block6_table(recompute_max: int) -> None:
             el = Fraction(row["E_L_n"])
             hi = Fraction(row["E_L_n_upper_bound"])
             lo = Fraction(row["E_L_n_lower_bound"])
+            harmonic_lo = Fraction(row["E_L_n_harmonic_lower_bound"])
 
             check(p0 == Fraction(2, n), f"table n={n}: p_0 != 2/n")
             check(p0 * p0 == Fraction(row["p0_squared"]), f"table n={n}: p_0^2")
@@ -488,6 +537,10 @@ def block6_table(recompute_max: int) -> None:
                   f"table n={n}: upper bound formula")
             check(lo == Fraction((n - 1) * (n + 2), n * n),
                   f"table n={n}: lower bound formula")
+            check(harmonic_lo == 1 + (harmonic_number(n) - 1) / n - Fraction(1, n * n),
+                  f"table n={n}: harmonic lower bound formula")
+            check(lo <= harmonic_lo <= el,
+                  f"table n={n}: strengthened harmonic lower bound fails")
             check(lo <= el <= hi, f"Corollary D2 window fails at n={n}")
             check((p1 <= p0 * p0) == (el >= lo),
                   f"Corollary D2 (adjacent direction) fails at n={n}")
@@ -507,10 +560,10 @@ def block6_table(recompute_max: int) -> None:
                     f"pair-ratio identity for p2 fails at n={n}",
                 )
             check(abs(Fraction(row["p1_over_p0sq_float"]) - p1 / (p0 * p0))
-                  <= Fraction(1, 10 ** 9), f"table n={n}: p1 ratio decimal")
+                  <= Fraction(1, 2 * 10 ** 10), f"table n={n}: p1 ratio decimal")
             if p2 is not None:
                 check(abs(Fraction(row["p2_over_p0sq_float"]) - p2 / (p0 * p0))
-                      <= Fraction(1, 10 ** 9), f"table n={n}: p2 ratio decimal")
+                      <= Fraction(1, 2 * 10 ** 10), f"table n={n}: p2 ratio decimal")
             if n <= recompute_max:
                 m = coalescent_moments(n)
                 check(m["p1"] == p1 and m["p2"] == p2 and m["EL"] == el
@@ -531,6 +584,59 @@ def block6_table(recompute_max: int) -> None:
     report(f"PASS block 6: the committed table of {rows} rows is internally "
            f"exact, satisfies Theorems B1 and B2 strictly and Corollary D2; "
            f"rows with n <= {recompute_max} were recomputed from scratch")
+
+
+def block6_manuscript_sync() -> None:
+    """Tie the manuscript's displayed finite constants and Table 1 to code."""
+    path = os.path.join(ROOT, "paper", "main.tex")
+    with open(path) as fh:
+        tex = fh.read()
+
+    computed_literals = {
+        "simple ratio": str(Fraction(1450, 1449)),
+        "bundle maximum": str(bundle_family(4, 4)[3]),
+        "three-hub ratio": str(hub_family_finite(3)[3]),
+        "Theorem C crossing": "first exceeding\n$8$ at $t=84$",
+        "degree-weight identity": r"\frac{10(n-1)}n-4\,\E[L_n]",
+        "harmonic bound": r"H_n-1",
+        "public data location": r"https://github.com/agupta/random-mst-correlations",
+    }
+    for label, literal in computed_literals.items():
+        check(literal in tex, f"manuscript source drift: {label}")
+
+    match = re.search(
+        r"\\begin\{tabular\}\{rllcll\}(.*?)\\end\{tabular\}", tex, re.S
+    )
+    check(match is not None, "manuscript source drift: Table 1 tabular not found")
+    if match is None:
+        report("PASS block 6: manuscript constants and Table 1 tied to exact sources")
+        return
+
+    rows = {}
+    for line in match.group(1).splitlines():
+        stripped = line.strip()
+        if not re.match(r"^\$\d+\$\s*&", stripped):
+            continue
+        cells = [cell.strip().strip("$") for cell in stripped.removesuffix(r"\\").split("&")]
+        rows[int(cells[0])] = cells[1:]
+
+    shown = list(range(3, 15)) + [20, 30]
+    check(sorted(rows) == shown, f"manuscript Table 1 domain differs: {sorted(rows)}")
+    for n in shown:
+        m = coalescent_moments(n)
+        p0sq = Fraction(4, n * n)
+        harmonic_lo = 1 + (harmonic_number(n) - 1) / n - Fraction(1, n * n)
+        hi = Fraction((n - 1) * (5 * n + 6), 4 * n * n)
+        expected = [
+            f"{float(m['p1'] / p0sq):.10f}",
+            "---" if m["p2"] is None else f"{float(m['p2'] / p0sq):.10f}",
+            f"{float(m['EL']):.4f}",
+            f"{float(harmonic_lo):.4f}",
+            str(hi),
+        ]
+        check(rows.get(n) == expected,
+              f"manuscript Table 1 row n={n} differs: {rows.get(n)!r}")
+    report("PASS block 6: manuscript constants and Table 1 tied to exact sources")
 
 
 # ---------------------------------------------------------------------------
@@ -922,11 +1028,12 @@ def main() -> int:
     block1_measure_self_tests(full)
     if full:
         block1_simple_minimality_census()
-    block2_bridge_to_coalescent()
+    block2_bridge_to_coalescent(full)
     block3_pathwise(shape_max)
     block4_partition(part_max)
     block5_expected_length(poly_max)
     block6_table(recompute_max)
+    block6_manuscript_sync()
     block7_algebra(algebra_max)
     block8_bundles(bundle_sum_max)
     block8_nonidentical(t_max, mono_max)

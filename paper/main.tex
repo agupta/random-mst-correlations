@@ -72,7 +72,7 @@ Let $G$ be a finite connected multigraph whose edges receive independent weights
 from one atomless law, and let $\MST(G)$ be the resulting random minimum
 spanning tree. Its law is not pairwise negatively correlated: Lyons, Peres and
 Schramm exhibited two positively correlated edges, and we give such an example
-on a simple graph. We prove that the failure is nevertheless bounded uniformly:
+on a simple graph. We prove that positive correlation is nevertheless uniformly controlled:
 \[
 \PMST(e,f\in T)\;\le\;8\,\PMST(e\in T)\,\PMST(f\in T),
 \]
@@ -135,6 +135,12 @@ $C=2$ for the \emph{uniform forest} measure, which follows from the work of
 Br\"and\'en and Huh on Lorentzian polynomials \cite{BH}; for further uniform
 spanning subgraph measures see \cite{TZ2}.
 
+Once the factor-$1$ inequality fails, a graph-independent multiplicative bound
+is a natural quantitative surrogate for negative dependence. The factor $2$ for
+uniform forests shows that this surrogate remains meaningful for a neighbouring
+random spanning-subgraph measure; the question is whether any such control
+survives the change from a uniform measure to Kruskal's order-driven law.
+
 \begin{theoremA}
 Let $G$ be a finite connected multigraph whose edge weights are independent and
 identically distributed with an atomless law, and let $e\ne f$ be edges of $G$.
@@ -144,10 +150,10 @@ Then
 \]
 \end{theoremA}
 
-Theorem A is proved in \S\ref{sec:universal}. It is stated for multigraphs, which
-is formally stronger than the question as posed and in particular covers the
-example \eqref{eq:lps}; loops, bridges, and pairs of parallel marked edges are
-included rather than excluded, as \S\ref{sec:degenerate} records.
+Theorem A is proved in \S\ref{sec:universal}. The multigraph setting includes
+the original obstruction \eqref{eq:lps}; loops, bridges, parallel marked edges,
+and disconnected deleted environments are covered in
+\S\ref{sec:degenerate}.
 
 The constant $8$ is not optimal. Proposition~\ref{prop:bundle} finds the exact
 maximum $78100/77841=1.00332\ldots$ in the two-parameter parallel-bundle family
@@ -238,6 +244,11 @@ p_2\le p_0^2\iff \E[L_n]\ \le\ \frac{(n-1)(5n+6)}{4n^2}\ \ \Bigl(\to\tfrac54\Big
 \end{gather*}
 Both estimates themselves hold for every $n\ge2$. The first is strict for
 $n\ge3$, while the second is strict for $n\ge4$.
+Moreover, with $H_n=\sum_{k=1}^n1/k$, the lower estimate strengthens to
+\[
+\E[L_n]\ \ge\ 1+\frac{H_n-1}{n}-\frac1{n^2}.
+\]
+This strengthened bound is exact for $n=2,3$ and strict for $n\ge4$.
 \end{theoremD2}
 
 \begin{theoremD3}
@@ -248,14 +259,11 @@ wired minimal spanning forest on the Poisson-weighted infinite tree computed in
 \cite[Proposition 3.11]{TZ}.
 \end{theoremD3}
 
-Proposition D1 is an exact finite identity, and Corollary D2 turns the whole
-complete-graph problem into a two-sided estimate of $\E[L_n]$; the two halves
-turn out to be of very different quality (\S\ref{sec:identity}). The identity also explains why
-the same constant $10-4\zeta(3)$ appears in the PWIT calculation of \cite{TZ}:
-the finite complete-graph second moment is tied exactly to the classical
-minimum-spanning-tree weight. Corollary D3 and its rate use the asymptotic
-results of \cite{CFIJS,LiZhang}; Theorems B1 and B2 remain finite and effective
-at every $n$.
+Thus one merger functional controls both pair correlations and the classical
+MST weight. Proposition D1 also explains the constant $10-4\zeta(3)$ in the
+PWIT calculation of \cite{TZ}. Only Corollary D3 and its rate use the
+asymptotic results of \cite{CFIJS,LiZhang}; Theorems B1 and B2 remain finite
+and effective at every $n$.
 
 \subsection{Identically distributed weights}
 \label{ssec:introC}
@@ -283,12 +291,11 @@ $8$ at $t=84$. In particular $R(t)\to\infty$, so no inequality of the form of Qu
 atomless edge weights.
 \end{theoremC}
 
-The two models are different, and
-Remark~\ref{rem:attenuation} quantifies the difference: the natural way to
-realise a $\max(U_1,\dots,U_t)$ law inside an i.i.d.\ model, namely subdividing
-an edge into a path, does not preserve the event ``one fixed edge lies in the
-tree'', and the resulting attenuation destroys exactly the amplification that
-Theorem C produces.
+Subdividing an edge into a path of $t$ i.i.d.\ uniform edges realizes the same
+maximum-weight law but not the same marked-edge event: requiring one fixed
+subdivided edge to lie in the tree introduces an attenuation that destroys the
+amplification above (Remark~\ref{rem:attenuation}). Thus Theorem C does not
+contradict the i.i.d.\ theorem.
 
 \subsection{The idea of the proofs}
 \label{ssec:idea}
@@ -342,9 +349,10 @@ the $n-1$ mergers. Both pair probabilities on $K_n$ are therefore governed by
 the single functional $H$, adjacent negative correlation asking for it to be
 large and disjoint negative correlation for it to be small. A pathwise identity
 --- every component other than the last one is the child of exactly one merger
---- rewrites $H$ as $n-1/n+J$, where $J$ sums $1/|C|$ over the components $C$
-created by mergers; since a created component has at most $n$ elements,
-$J\ge(n-1)/n$ pathwise, and that one line is Theorem B1. The other direction
+--- rewrites $H$ as $n-\frac1n+J$, where $J$ sums $1/|C|$ over the components $C$
+created by mergers. Chronology gives the sharper pathwise estimate
+$J\ge H_n-1$: the component created by the $j$th merger has at most $j+1$
+vertices. This is Theorem B1. The other direction
 needs $J$ bounded above, no pathwise bound is available
 (Remark~\ref{rem:notpathwise}), and this is where the multiplicative merger law
 enters: a one-step convexity inequality bounds the multiplicatively weighted
@@ -695,9 +703,9 @@ which is the first integrand of \eqref{eq:pAB}. The other order is symmetric.
 
 \subsection{Parallel bundles, and a lower bound for the optimal constant}
 
-A natural attempt to enlarge the ratio is to iterate the construction of
-\cite{LPS}, enlarging the two parallel bundles. It does not work, and the
-failure is quantitative. Let $R_{r,s}$ denote the ratio for one marked copy in
+Enlarging the two parallel bundles in the construction of \cite{LPS} does not
+increase the ratio indefinitely; the exact maximum is finite. Let $R_{r,s}$
+denote the ratio for one marked copy in
 each of two disjoint parallel bundles of sizes $r,s$ on $K_4$, the four cross
 edges uniform. Regard each bundle as a macro-edge whose weight is its minimum.
 If a macro-edge is selected, its unique lightest copy is selected, and symmetry
@@ -792,7 +800,7 @@ values from \cite{LPS}.
 
 Thus the parallel-bundle route cannot push the ratio above $1.0034$. The simple
 graphs below exceed this family maximum. Appendix~\ref{sec:verification}
-describes an independent exact check of the formulas and certificate.
+records the exact certificate checks.
 
 \subsection{Positive correlation in a simple graph}
 
@@ -817,16 +825,15 @@ p_{ef}=\frac{145}{504},\qquad
 All $8!$ strict edge orders are equally likely. Running Kruskal's rule through
 those orders accepts $e$ in $23520$ orders, accepts $f$ in $19872$ orders, and
 accepts both in $11600$ orders. Dividing by $8!=40320$ gives the three stated
-probabilities and hence the ratio. Appendix~\ref{sec:verification} records a
-second exact enumeration by relative-order patterns.
+probabilities and hence the ratio. Exact summation by relative-order patterns
+gives the same values.
 \end{proof}
 
 This witness is minimal by edge count. Indeed, a smallest counterexample may be
 assumed bridgeless: a bridge belongs to every spanning tree, and deleting all
 bridges separates independent minimum-spanning-tree problems. A connected
 bridgeless simple graph with $m$ edges has at most $m$ vertices. An exhaustive
-exact census of all such graphs with $m\le7$ finds no violation; the census is
-recorded in Appendix~\ref{sec:verification}.
+exact census of all such graphs with $m\le7$ finds no violation.
 
 The smallest witness is not the strongest one we know. Let $S$ be a set of hub
 vertices with no internal edges, take four further vertices $a,b,c,d$, and join
@@ -848,6 +855,10 @@ p_A=p_B=\frac{1123}{2730},\qquad p_{AB}=\frac{71479}{420420},\qquad
 \]
 In particular the second ratio is larger than the maximum
 $78100/77841$ in Proposition~\ref{prop:bundle}.
+
+For the finite range $1\le |S|\le9$, exact evaluation shows that the ratio is
+maximized at $|S|=3$ and is below $1$ for $|S|=7,8,9$. No assertion is made
+for all hub counts.
 \end{proposition}
 
 \begin{proof}
@@ -857,6 +868,8 @@ the relative positions of the two marked edges and the other twelve edges gives
 marginal count $35861253120$ and joint count $14821885440$ out of $14!$ orders.
 Dividing gives the stated probabilities. The relative-position calculation is
 also applied to the two-hub graph and agrees with its full enumeration.
+For $1\le |S|\le9$, grouping the relative-order patterns by the two induced
+partitions of $\{a,b,c,d\}$ gives the finite-range comparison exactly.
 \end{proof}
 
 \subsection{Non-identical laws: proof of Theorem C}
@@ -978,8 +991,8 @@ past, which involves only clocks that have already rung.
 
 Lemma~\ref{lem:coalescent} identifies the sequence of component sizes with the
 discrete skeleton of the multiplicative coalescent, cf.\ \cite{Aldous}. This is
-the only place where the complete graph enters. Appendix~\ref{sec:verification}
-checks the transition model against a direct evaluation of $\PMST$.
+the only place where the complete graph enters. Direct Kruskal enumerations on
+small complete graphs agree with this transition model.
 
 The two functionals below are the bookkeeping devices for the whole section.
 
@@ -1059,33 +1072,54 @@ and the two directions require quite different handles on the same quantity.
 
 \subsection{Adjacent pairs: proof of Theorem B1}
 
-\begin{proof}[Proof of Theorem B1]
-Every parent size in a merger history is at most $n$, and there are $n-1$
-mergers, so pathwise
+Write $H_n=\sum_{k=1}^n1/k$ for the $n$th harmonic number.
+
+\begin{lemma}[chronological reciprocal bound]
+\label{lem:harmonic}
+Every merger history on $n$ leaves satisfies
 \begin{equation}
 \label{eq:Jlower}
-J=\sum_{\text{mergers}}\frac1{a+b}\ \ge\ \frac{n-1}n ,
+J\ \ge\ H_n-1.
 \end{equation}
-with strict inequality for $n\ge3$ because the first merger has parent size
-$2<n$. By Lemma~\ref{lem:HJ}, $H\ge n-1/n+(n-1)/n=n+(n-2)/n$ pathwise, and hence
-by Lemma~\ref{lem:drift}
-\begin{equation}
-\label{eq:Phiupper}
-\E[\Phi]\ \le\ 8(n-1)-4n-\frac{4(n-2)}n=\frac{4(n-1)(n-2)}n ,
-\end{equation}
-strictly for $n\ge3$. By vertex exchangeability, if $D$ is the degree of a fixed
-vertex then $\E[D(D-1)]=\E[\Phi]/n$. Finally, $K_n$ has exactly $n(n-1)(n-2)$
-ordered pairs of distinct edges sharing a vertex (choose the shared vertex, then
-an ordered pair of distinct other endpoints), and each contributes $p_1$ to
-$\E[\Phi]$, so
+Equality holds exactly for a comb history: after the first merger, each merger
+attaches one singleton to the component created at the preceding step.
+\end{lemma}
+
+\begin{proof}
+Order the mergers chronologically. The component created by the $j$th merger
+has size at most $j+1$, since a tree component on $s$ vertices requires $s-1$
+accepted edges among those vertices. Therefore
 \[
-p_1=\frac{\E[\Phi]}{n(n-1)(n-2)}<\frac1{n(n-1)(n-2)}\cdot\frac{4(n-1)(n-2)}n
-=\frac4{n^2}=p_0^2 . \qedhere
+J\ge\sum_{j=1}^{n-1}\frac1{j+1}=H_n-1.
 \]
+Equality requires the successive parent sizes to be $2,3,\ldots,n$. After the
+first merger, induction then forces the component just created to merge with a
+singleton at every step. Conversely such a comb history has precisely those
+parent sizes and attains equality.
 \end{proof}
 
-The adjacent case thus rests on a single pathwise observation: a component
-created by a merger has at most $n$ elements.
+\begin{proof}[Proof of Theorem B1]
+Lemmas~\ref{lem:HJ} and \ref{lem:harmonic} give
+$H\ge n-\frac1n+H_n-1$ pathwise, and hence Lemma~\ref{lem:drift} gives
+\begin{equation}
+\label{eq:Phiupper}
+\E[\Phi]\ \le\ 4\left(n-1-H_n+\frac1n\right).
+\end{equation}
+By vertex exchangeability, if $D$ is the degree of a fixed vertex then
+$\E[D(D-1)]=\E[\Phi]/n$. Finally, $K_n$ has exactly $n(n-1)(n-2)$
+ordered pairs of distinct edges sharing a vertex (choose the shared vertex, then
+an ordered pair of distinct other endpoints), and each contributes $p_1$ to
+$\E[\Phi]$. Consequently
+\[
+\frac{p_1}{p_0^2}
+\le \frac{n(n-1-H_n)+1}{(n-1)(n-2)}<1.
+\]
+The last inequality is equivalent to $H_n>2-1/n$, which holds at $n=3$ and
+then by induction. Thus $p_1<p_0^2$. \qedhere
+\end{proof}
+
+The chronological bound is sharp over merger histories, although not generally
+in expectation. At $n=3$ it gives the exact ratio $p_1/p_0^2=3/4$.
 
 \subsection{Disjoint pairs: proof of Theorem B2}
 
@@ -1211,16 +1245,6 @@ Two distinct edges of $K_n$ either share a vertex or not; apply Theorem B1 or
 Theorem B2. For $n=3$ no disjoint pair exists.
 \end{proof}
 
-\begin{remark}
-In the language of \cite[Corollary 2.4]{TZ}, which the counting in this section
-and Corollary D2 reprove: with $D$ the degree of a fixed vertex,
-$p_1\le p_0^2\iff\E[D^2]\le6-14/n+8/n^2$ and
-$p_2\le p_0^2\iff\E[D^2]\ge5-11/n+6/n^2$. So the two halves of Corollary B3
-squeeze $\E[D^2]$ into a window of width $1-3/n+2/n^2$ around $5$--$6$; the
-limiting window is $(5,6)$ and the true limit is $10-4\zeta(3)=5.1917\ldots$ by
-Corollary D3.
-\end{remark}
-
 \section{The identity, and the reduction to \texorpdfstring{$\E[L_n]$}{E[Ln]}}
 \label{sec:identity}
 
@@ -1271,18 +1295,22 @@ $p_1\le p_0^2$ is
 $\E[\Phi]\le4(n-1)(n-2)/n$, i.e.\ $8(n-1)-4n\E[L_n]\le4(n-1)(n-2)/n$, i.e.\
 $\E[L_n]\ge(n-1)(n+2)/n^2$. For $n\ge4$, likewise $p_2\le p_0^2$ is
 $\E[\Phi]\ge3(n-1)(n-2)/n$, i.e.\ $\E[L_n]\le(n-1)(5n+6)/(4n^2)$.
-The lower estimate follows for every $n\ge2$ from \eqref{eq:Jlower}, and the
-upper estimate from Lemma~\ref{lem:budget}; their equality statements follow
-from the strictness statements there.
+Lemma~\ref{lem:harmonic}, Lemma~\ref{lem:HJ}, and Lemma~\ref{lem:HeqnL} give
+\[
+\E[L_n]\ge1+\frac{H_n-1}{n}-\frac1{n^2}.
+\]
+This implies the weaker lower threshold in the equivalence because
+$H_n-1\ge(n-1)/n$. Equality in the harmonic bound holds for $n=2,3$; for
+$n\ge4$ a non-comb history has positive probability, so it is strict. The
+upper estimate and its equality statements follow from Lemma~\ref{lem:budget}.
 \end{proof}
 
-Thus Theorem B1 is the statement $\E[L_n]\ge(n-1)(n+2)/n^2$ and Theorem B2 is the
-statement $\E[L_n]\le(n-1)(5n+6)/(4n^2)$, and \S\ref{sec:kn} proves both without
-any input from the minimum-spanning-tree-weight literature. Numerically the lower
-bound tends to $1$ and is far from tight, while the upper bound tends to $5/4$
-and is tight to about $1\%$: see Table~\ref{tab:exact}. Thus the adjacent case,
-which requires the lower bound on $\E[L_n]$, is resolved here by the looser of
-the two estimates. Both pair ratios increase in the computed range. The maximum
+Thus the two pair inequalities become bounds on $\E[L_n]$, proved here without
+input from the minimum-spanning-tree-weight literature. The harmonic lower bound
+still tends to $1$ and is asymptotically loose. The upper bound tends to $5/4$:
+it is exact at $n=2,3$, within $1\%$ of $\E[L_n]$ through $n=10$, and about
+$4\%$ above the limit $\zeta(3)$. See Table~\ref{tab:exact}. Both pair ratios
+increase in the computed range. The maximum
 of $\E[L_n]$ in Gamarnik's range $2\le n\le45$ occurs at $n=8$, where
 $\E[L_8]=1.2459812\ldots$ against the upper bound $161/128=1.2578125$;
 decrease for every $n\ge8$ remains conjectural \cite[Conjecture 4.1]{Gamarnik}.
@@ -1291,29 +1319,29 @@ decrease for every $n\ge8$ remains conjectural \cite[Conjecture 4.1]{Gamarnik}.
 \centering
 \begin{tabular}{rllcll}
 \toprule
-$n$ & $p_1/p_0^2$ & $p_2/p_0^2$ & $\E[L_n]$ & lower bd.\ $\frac{(n-1)(n+2)}{n^2}$
+$n$ & $p_1/p_0^2$ & $p_2/p_0^2$ & $\E[L_n]$ & harmonic lower bd.
 & upper bd.\ $\frac{(n-1)(5n+6)}{4n^2}$\\
 \midrule
-$3$  & $0.7500000000$ & ---            & $1.1667$ & $10/9$    & $7/6$\\
-$4$  & $0.7555555556$ & $0.9777777778$ & $1.2167$ & $9/8$     & $39/32$\\
-$5$  & $0.7597552910$ & $0.9804894180$ & $1.2353$ & $28/25$   & $31/25$\\
-$6$  & $0.7630719281$ & $0.9825707626$ & $1.2427$ & $10/9$    & $5/4$\\
-$7$  & $0.7657742674$ & $0.9842257326$ & $1.2454$ & $54/49$   & $123/98$\\
-$8$  & $0.7680285888$ & $0.9855771290$ & $1.2460$ & $35/32$   & $161/128$\\
-$9$  & $0.7699442296$ & $0.9867038469$ & $1.2455$ & $88/81$   & $34/27$\\
-$10$ & $0.7715965139$ & $0.9876591349$ & $1.2445$ & $27/25$   & $63/50$\\
-$11$ & $0.7730392810$ & $0.9884803595$ & $1.2432$ & $130/121$ & $305/242$\\
-$12$ & $0.7743121839$ & $0.9891945849$ & $1.2418$ & $77/72$   & $121/96$\\
-$13$ & $0.7754451621$ & $0.9898219351$ & $1.2405$ & $180/169$ & $213/169$\\
-$14$ & $0.7764613009$ & $0.9903777088$ & $1.2391$ & $52/49$   & $247/196$\\
-$20$ & $0.7809063153$ & $0.9927279258$ & $1.2323$ & $209/200$ & $1007/800$\\
-$30$ & $0.7850808025$ & $0.9948028441$ & $1.2250$ & $232/225$ & $377/300$\\
+$3$  & $0.7500000000$ & ---            & $1.1667$ & $1.1667$ & $7/6$\\
+$4$  & $0.7555555556$ & $0.9777777778$ & $1.2167$ & $1.2083$ & $39/32$\\
+$5$  & $0.7597552910$ & $0.9804894180$ & $1.2353$ & $1.2167$ & $31/25$\\
+$6$  & $0.7630719281$ & $0.9825707626$ & $1.2427$ & $1.2139$ & $5/4$\\
+$7$  & $0.7657742674$ & $0.9842257326$ & $1.2454$ & $1.2071$ & $123/98$\\
+$8$  & $0.7680285888$ & $0.9855771290$ & $1.2460$ & $1.1991$ & $161/128$\\
+$9$  & $0.7699442296$ & $0.9867038469$ & $1.2455$ & $1.1909$ & $34/27$\\
+$10$ & $0.7715965139$ & $0.9876591349$ & $1.2445$ & $1.1829$ & $63/50$\\
+$11$ & $0.7730392810$ & $0.9884803595$ & $1.2432$ & $1.1754$ & $305/242$\\
+$12$ & $0.7743121839$ & $0.9891945849$ & $1.2418$ & $1.1683$ & $121/96$\\
+$13$ & $0.7754451621$ & $0.9898219351$ & $1.2405$ & $1.1618$ & $213/169$\\
+$14$ & $0.7764613009$ & $0.9903777088$ & $1.2391$ & $1.1557$ & $247/196$\\
+$20$ & $0.7809063153$ & $0.9927279258$ & $1.2323$ & $1.1274$ & $1007/800$\\
+$30$ & $0.7850808025$ & $0.9948028441$ & $1.2250$ & $1.0987$ & $377/300$\\
 \bottomrule
 \end{tabular}
-\caption{Exact pair correlations for $\MST(K_n)$ and the two-sided estimate of
-$\E[L_n]$ from Corollary D2. Every entry comes from an exact rational; the
-$\E[L_n]$ column is rounded to four decimals. The full exact table for
-$3\le n\le30$ accompanies the paper.}
+\caption{Exact pair correlations for $\MST(K_n)$, the harmonic lower bound,
+and the upper bound from Corollary D2. Every entry comes from an exact rational;
+the correlation-ratio, $\E[L_n]$, and harmonic-bound decimals are rounded as
+displayed. The full exact table for $3\le n\le30$ accompanies the paper.}
 \label{tab:exact}
 \end{table}
 
@@ -1473,36 +1501,29 @@ on an infinite graph?
 
 The universal statements of \S\ref{sec:universal} and the complete-graph
 theorems of \S\ref{sec:kn}--\ref{sec:identity} use no computation. Computation
-enters in three places: it supplies the exact census of Table~\ref{tab:exact},
-proves the finite enumerations in Propositions~\ref{prop:simple-counterexample}
-and \ref{prop:hub-witnesses}, and checks the algebra of
-Proposition~\ref{prop:bundle} and the transition model of
-Lemma~\ref{lem:coalescent} against direct evaluations of $\PMST$. Every
-quantity is an exact rational; decimals are rounded only when printed. The full
-table for $3\le n\le30$ accompanies the paper as
-\texttt{data/kn-exact-table.csv}. The code uses only the Python standard
-library, and the repository records the commands and provenance.
+supplies the exact table and the finite enumerations in
+Propositions~\ref{prop:simple-counterexample} and \ref{prop:hub-witnesses}, and
+checks the algebra of Proposition~\ref{prop:bundle} and the coalescent model
+against direct evaluations of $\PMST$. Every computed quantity is an exact
+rational; decimals are rounded only when printed. The full table and
+standard-library Python code are available in the public companion repository
+\url{https://github.com/agupta/random-mst-correlations}; the citable preprint is
+archived at \href{https://doi.org/10.5281/zenodo.21780630}{doi:10.5281/zenodo.21780630}.
 
 \subsection{What each computation evaluates}
 
 \begin{enumerate}
-\item \emph{Brute force over orderings.} For a small multigraph, enumerate all
-$m!$ orderings of the edges, run Kruskal on each, and count. This evaluates
-$\PMST$ directly from its definition. It is used on $K_4$ (720 orders), the
-five-vertex graph of Proposition~\ref{prop:simple-counterexample} (40320
-orders), the two-hub graph of Proposition~\ref{prop:hub-witnesses} ($10!$
-orders), and small multigraphs.
-\item \emph{Exact summation over order patterns.} Condition on the set of edges
-lighter than $e$, or, for $p_{ef}$, on the three blocks into which the two marked
-weights split the remaining $m-2$ edges, and sum the exact rational probability
-of each pattern. This too evaluates $\PMST$ directly, by a different
-enumeration, and reaches $K_5$, both simple-graph propositions, and the example
-\eqref{eq:lps}.
-\item \emph{The accepted-merger coalescent.} The dynamic program over integer
-partitions given by \eqref{eq:mcrate}, returning $\E[J]$, $\E[H]$, $\E[\Phi]$,
-$\E[D^2]$, $p_1$, $p_2$ and $\E[L_n]$ exactly. This is the machinery of
-\S\ref{sec:kn}, so it is not independent evidence for \S\ref{sec:kn}; it is what
-routes 1 and 2 are used to test.
+\item \emph{Direct Kruskal enumerations.} One route enumerates all $m!$ edge
+orders; another sums exactly over the relative-order blocks determined by the
+marked weights. These are distinct finite enumerations, but both use the same
+Kruskal/union--find semantics. They cover $K_4$, $K_5$, the small-graph
+examples, and the two- and three-hub instances; a symmetry-compressed version
+handles the hub family for $1\le s\le9$.
+\item \emph{The accepted-merger coalescent.} A dynamic program over integer
+partitions with transition probabilities \eqref{eq:mcrate} returns $\E[J]$,
+$\E[H]$, $\E[\Phi]$, $\E[D^2]$, $p_1$, $p_2$ and $\E[L_n]$ exactly. This
+implements the proof in \S\ref{sec:kn}, rather than providing independent
+evidence for it; the direct Kruskal computations test it in small cases.
 \item \emph{$\E[L_n]$ from the area identity.} Independently of the coalescent,
 the component count $\kappa(t)$ of $G(n,1-e^{-t})$ gives
 \[
@@ -1513,40 +1534,31 @@ built from the exact connectivity polynomial of $G(s,p)$, and the integral
 becomes a finite rational sum. This route uses neither mergers nor degrees.
 \end{enumerate}
 
-Lemma~\ref{lem:coalescent} is checked from outside by these routes: routes 1 and
-2 agree with each other on every marginal and every pair probability of $K_4$,
-and both agree with route 3 on $p_1$, $p_2$, on $\E[\Phi]=8(n-1)-4\E[H]$ and on
-Proposition D1 at $n=4$ and $n=5$; route 4 agrees with route 3 on $\E[L_n]$; and
-route 3 agrees with the published table of \cite{Gamarnik} through $n=30$ in
-the full suite (the committed transcription extends through $n=45$). The
-self-consistency checks $p_0=2/n$, $\sum_e p_e=n-1$ and $\E[H]=n-1/n+\E[J]$ are
-also verified, the last recomputed from the dynamic program rather than assumed.
+The direct routes agree on every marginal and pair probability of $K_4$ and
+agree with the coalescent program on $p_1$, $p_2$, and
+$\E[\Phi]=8(n-1)-4\E[H]$ for $n=4,5$. The connectivity-polynomial route agrees
+with it on $\E[L_n]$, thereby checking Proposition D1 without reusing the
+coalescent identity $\E[H]=n\E[L_n]$. The resulting table agrees with
+\cite{Gamarnik} through $n=30$; the committed transcription extends through
+$n=45$. Internal identities such as $p_0=2/n$, $\sum_e p_e=n-1$, and
+$\E[H]=n-\frac1n+\E[J]$ are also checked, but are not counted as independent
+routes.
 
 \subsection{What is verified, and in what range}
 
-The lemmas of \S\ref{sec:kn} are verified exhaustively in finite ranges:
-Lemma~\ref{lem:HJ} and the pathwise bound \eqref{eq:Jlower} on every merger
-history shape up to $n=12$; Lemma~\ref{lem:partition}, together with its equality
-characterisation, on every integer partition of every $n\le32$; and the closing
-algebra of \S\ref{sec:kn} and \S\ref{sec:identity} as rational identities for
-$n<300$. The chain of inequalities in the proof of Theorem A is verified,
-instance by instance and exactly, on an explicitly generated exhaustive universe
-of connected labelled multigraphs --- including loops, parallel classes and
-disconnected deleted environments --- for every marked pair, together with the
-frozen-environment forms of Lemmas~\ref{lem:harris} and \ref{lem:sandwich}
-obtained by exact integration over the two marked weights. The bundle family of
-Proposition~\ref{prop:bundle} is evaluated for all $r+s\le120$ in the widest
-documented run, and its two positive-coefficient certificates are re-expanded
-coefficient by coefficient. The positive-coefficient certificate for
-$R(t+1)>R(t)$ is likewise re-expanded; an additional finite scan reaches
-$t=300$ in the widest run. The two- and three-hub probabilities are recomputed
-by relative-order enumeration, and the two-hub graph also by all $10!$ orders.
-The minimality statement after Proposition~\ref{prop:simple-counterexample}
-uses the bridge reduction printed there and a census of 1528 labelled
-bridgeless graphs with at most seven edges, collapsing to 17 isomorphism
-classes and 272 representative marked pairs. Finally, the formulas of Theorem C
-and Remark~\ref{rem:attenuation} are checked directly on the corresponding
-i.i.d.\ subdivided graphs for $t=1,2,3$.
+The documented exhaustive ranges are as follows. Merger histories are checked
+through $n=12$, integer partitions through $n=32$, and the closing rational
+algebra through $n<300$. Theorem A and its frozen-environment lemmas are checked
+on every connected labelled multigraph with at most four vertices and at most
+six edges, allowing loops, parallel classes, and disconnected deleted
+environments. The bundle certificates are re-expanded coefficientwise and the
+family is evaluated for $r+s\le120$; the $R(t+1)>R(t)$ certificate is similarly
+re-expanded and scanned through $t=300$. The hub-family computation covers
+$1\le s\le9$. The simple-graph minimality assertion uses the bridge reduction
+in the text and a census of 1528 labelled bridgeless graphs with at most seven
+edges, reducing to 17 isomorphism classes and 272 representative marked pairs.
+Theorem C and Remark~\ref{rem:attenuation} are also checked directly for
+subdivision lengths $t=1,2,3$.
 
 Several tempting strengthenings fail, and the suite retains them as controls:
 $C=1$ fails by \eqref{eq:lps}; $\E[T^2]\le\frac32(\E T)^2$ fails for the
@@ -1556,9 +1568,9 @@ equality when both marked edges are bridges; and Lemma~\ref{lem:partition}
 fails at $(2,1,1)$ if block pairs are chosen uniformly rather than with
 multiplicative weights.
 
-These finite checks do not replace the proofs above. They test the modelling
-and algebra and establish the explicitly finite assertions: the exact table,
-the enumerated counterexamples, and the edge-count minimality census.
+These checks establish only the stated finite assertions and test the modelling
+and algebra; they do not replace the analytic proofs. Complete commands and
+ranges are recorded in the companion repository README.
 
 \section*{Acknowledgment of generative-AI assistance}
 Anthropic Claude Code (Claude 5 family) and OpenAI Codex (GPT-5.6 family) were
