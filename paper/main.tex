@@ -1,23 +1,29 @@
-\documentclass[11pt]{article}
+\documentclass[11pt,a4paper]{amsart}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\usepackage{microtype}
 \usepackage{amsmath,amssymb,amsthm}
-\usepackage[margin=1.1in]{geometry}
+\usepackage[margin=1.15in]{geometry}
 \usepackage{booktabs}
+\usepackage{xcolor}
 \usepackage{hyperref}
 \input{glyphtounicode}
 \pdfgentounicode=1
+\microtypesetup{protrusion=true,expansion=false}
+\setlength{\emergencystretch}{3em}
+\raggedbottom
 \hypersetup{
   colorlinks=true,
-  linkcolor=blue,
-  citecolor=blue,
-  urlcolor=blue,
+  linkcolor=blue!45!black,
+  citecolor=blue!45!black,
+  urlcolor=blue!45!black,
   pdfauthor={Anish Gupta},
   pdftitle={Pairwise edge correlations in random minimum spanning trees},
   pdfsubject={Universal correlation bounds and complete-graph negative correlation},
-  pdfkeywords={minimum spanning tree, negative correlation, multiplicative coalescent}
+  pdfkeywords={minimum spanning tree, negative correlation, multiplicative coalescent},
+  pdfdisplaydoctitle=true
 }
 
 \theoremstyle{plain}
@@ -47,17 +53,19 @@
 \newcommand{\PP}{\mathbf{P}}
 \DeclareMathOperator{\dg}{deg}
 
-\title{Pairwise edge correlations in random minimum spanning trees:\\
-a universal bound and complete-graph negative correlation}
-\author{Anish Gupta\thanks{Independent researcher.
-  \texttt{ag2269@cantab.ac.uk};
-  ORCID: \href{https://orcid.org/0009-0008-8137-7729}
-  {0009-0008-8137-7729}.}}
-\date{August 2026}
+\title[Pairwise edge correlations in random minimum spanning trees]
+  {Pairwise edge correlations in random minimum spanning trees:\\
+  a universal bound and complete-graph negative correlation}
+\author{Anish Gupta}
+\address{Independent researcher}
+\email{ag2269@cantab.ac.uk}
+\urladdr{https://orcid.org/0009-0008-8137-7729}
+\date{6 August 2026}
+\subjclass[2020]{Primary 60C05; Secondary 05C80, 05C85}
+\keywords{minimum spanning tree, negative correlation, pair correlation,
+  multiplicative coalescent, random graphs}
 
 \begin{document}
-
-\maketitle
 
 \begin{abstract}
 Let $G$ be a finite connected multigraph whose edges receive independent weights
@@ -80,6 +88,8 @@ both pair-correlation ratios. Finally, an explicit $K_4$ family shows that no
 universal constant survives when the independent edge laws need not be
 identical.
 \end{abstract}
+
+\maketitle
 
 \section{Introduction}
 \label{sec:intro}
@@ -1494,11 +1504,13 @@ $\E[D^2]$, $p_1$, $p_2$ and $\E[L_n]$ exactly. This is the machinery of
 \S\ref{sec:kn}, so it is not independent evidence for \S\ref{sec:kn}; it is what
 routes 1 and 2 are used to test.
 \item \emph{$\E[L_n]$ from the area identity.} Independently of the coalescent,
-$\E[L_n]=\int_0^\infty(\E[\kappa(t)]-1)\,dt$ where $\kappa(t)$ counts components
-of $G(n,1-e^{-t})$; substituting $u=e^{-t}$ turns the integrand into an integer
-polynomial in $u$ built from the exact connectivity polynomial of $G(s,p)$, so
-the integral is a finite rational sum. This route knows nothing about mergers,
-degrees, or the coalescent.
+the component count $\kappa(t)$ of $G(n,1-e^{-t})$ gives
+\[
+  \E[L_n]=\int_0^\infty(\E[\kappa(t)]-1)\,dt.
+\]
+Substituting $u=e^{-t}$ turns the integrand into an integer polynomial in $u$
+built from the exact connectivity polynomial of $G(s,p)$, and the integral
+becomes a finite rational sum. This route uses neither mergers nor degrees.
 \end{enumerate}
 
 Lemma~\ref{lem:coalescent} is checked from outside by these routes: routes 1 and
